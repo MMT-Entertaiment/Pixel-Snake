@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Pixel-Snake",
+    "name": "Pixel Snake",
     "slug": "pixel-snake",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,11 +9,12 @@
       "adaptiveIcon": {
         "backgroundColor": "#0a0a0f"
       },
-      "package": "com.yourname.pixelsnake"
+      "package": "com.mstudiogames.pixel-snake"
     },
-    "ios": {
-      "supportsTablet": false,
-      "bundleIdentifier": "com.yourname.pixelsnake"
+    "extra": {
+      "eas": {
+        "projectId": "pixel-snake"
+      }
     }
   }
 }
