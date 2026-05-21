@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 
 // 👇 Remplace par l'URL de ton serveur déployé
-const SERVER_URL = 'http://localhost:3000';
+const SERVER_URL = 'https://pixel-snake-server-mstudiogames.up.railway.app';
 
 let socketInstance = null;
 
