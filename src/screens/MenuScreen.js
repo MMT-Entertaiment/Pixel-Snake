@@ -1,235 +1,211 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity,
-  StyleSheet, KeyboardAvoidingView, Platform,
-  Animated, useWindowDimensions,
+  StyleSheet, Image, KeyboardAvoidingView,
+  Platform, Dimensions, ActivityIndicator,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { COLORS } from '../utils/constants';
+import * as Font from 'expo-font';
 
-export default function MenuScreen({ onJoin, onCreate, error }) {
+const { width } = Dimensions.get('window');
+const BG_COLOR = '#3a3a3a';
+
+export default function MenuScreen({ onMultiplayer, onSolo, onSkins, error }) {
   const [name, setName] = useState('');
-  const [roomCode, setRoomCode] = useState('');
-  const [mode, setMode] = useState(null); // 'join' | 'create'
-  const { width } = useWindowDimensions();
+  const [fontsLoaded, setFontsLoaded] = useState(false);
 
-  const handleJoin = () => {
-    if (!name.trim()) return;
-    onJoin(name.trim(), roomCode.trim() || null);
-  };
+  useEffect(() => {
+    async function loadFonts() {
+      await Font.loadAsync({
+        'Grapesoda': require('../../assets/fonts/Grapesoda.ttf'),
+      });
+      setFontsLoaded(true);
+    }
+    loadFonts();
+  }, []);
 
-  const handleCreate = () => {
-    if (!name.trim()) return;
-    onCreate(name.trim());
-  };
+  if (!fontsLoaded) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator color="#cc44ff" size="large" />
+      </View>
+    );
+  }
 
   return (
-    <LinearGradient colors={['#0a0a0f', '#0d0d18', '#0a0a0f']} style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.inner}
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      {/* Engrenage settings */}
+      <TouchableOpacity style={styles.settingsBtn}>
+        <Image
+          source={require('../../assets/images/settings.png')}
+          style={styles.settingsIcon}
+          resizeMode="contain"
+        />
+      </TouchableOpacity>
+
+      {/* Logo suspendu */}
+      <View style={styles.logoContainer}>
+        <View style={styles.ropesRow}>
+          <View style={styles.rope} />
+          <View style={styles.rope} />
+        </View>
+        <Image
+          source={require('../../assets/images/logo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
+      <View style={{ flex: 1 }} />
+
+      {/* Input pseudo */}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="enter your Player name"
+          placeholderTextColor="#888"
+          value={name}
+          onChangeText={setName}
+          maxLength={16}
+          autoCapitalize="none"
+        />
+        <View style={styles.inputUnderline} />
+      </View>
+
+      {/* Bouton Multijoueur */}
+      <TouchableOpacity
+        style={[styles.btn, styles.btnMulti]}
+        onPress={() => onMultiplayer(name.trim())}
+        activeOpacity={0.85}
       >
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <Text style={styles.logoEmoji}>🐍</Text>
-          <Text style={styles.title}>SNAKE</Text>
-          <Text style={styles.subtitle}>MULTIPLAYER</Text>
-          <Text style={styles.tagline}>Jusqu'à 20 joueurs en ligne</Text>
+        <Text style={styles.btnText}>Multijoueur</Text>
+      </TouchableOpacity>
+
+      {/* Bouton Solo vs IA */}
+      <TouchableOpacity
+        style={[styles.btn, styles.btnSolo]}
+        onPress={() => onSolo(name.trim())}
+        activeOpacity={0.85}
+      >
+        <Text style={styles.btnText}>Solo vs IA</Text>
+      </TouchableOpacity>
+
+      {error && (
+        <View style={styles.errorBox}>
+          <Text style={styles.errorText}>⚠️ {error}</Text>
         </View>
+      )}
 
-        {/* Input pseudo */}
-        <View style={styles.form}>
-          <Text style={styles.label}>TON PSEUDO</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Entre ton nom..."
-            placeholderTextColor={COLORS.textDim}
-            value={name}
-            onChangeText={setName}
-            maxLength={16}
-            autoCapitalize="none"
-          />
+      <View style={{ flex: 1 }} />
 
-          {/* Mode selection */}
-          {!mode && (
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnPrimary]}
-                onPress={() => setMode('create')}
-              >
-                <Text style={styles.btnText}>➕ CRÉER</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnSecondary]}
-                onPress={() => setMode('join')}
-              >
-                <Text style={[styles.btnText, { color: COLORS.primary }]}>🔗 REJOINDRE</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Créer une salle */}
-          {mode === 'create' && (
-            <View>
-              <TouchableOpacity
-                style={[styles.btn, styles.btnPrimary, { marginTop: 12 }]}
-                onPress={handleCreate}
-              >
-                <Text style={styles.btnText}>🚀 CRÉER LA SALLE</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setMode(null)} style={styles.backBtn}>
-                <Text style={styles.backText}>← Retour</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Rejoindre une salle */}
-          {mode === 'join' && (
-            <View>
-              <Text style={[styles.label, { marginTop: 16 }]}>CODE DE SALLE</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Ex: ABCD"
-                placeholderTextColor={COLORS.textDim}
-                value={roomCode}
-                onChangeText={setRoomCode}
-                maxLength={6}
-                autoCapitalize="characters"
-              />
-              <TouchableOpacity
-                style={[styles.btn, styles.btnPrimary, { marginTop: 12 }]}
-                onPress={handleJoin}
-              >
-                <Text style={styles.btnText}>🎮 REJOINDRE</Text>
-              </TouchableOpacity>
-              <TouchableOpacity onPress={() => setMode(null)} style={styles.backBtn}>
-                <Text style={styles.backText}>← Retour</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
-          {/* Erreur */}
-          {error && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorText}>⚠️ {error}</Text>
-            </View>
-          )}
-        </View>
-
-        {/* Footer */}
-        <Text style={styles.footer}>v1.0.0 — Made with 🐍</Text>
-      </KeyboardAvoidingView>
-    </LinearGradient>
+      {/* Bouton Skins */}
+      <TouchableOpacity style={styles.skinsBtn} onPress={onSkins} activeOpacity={0.85}>
+        <Text style={styles.skinsBtnText}>Skins</Text>
+      </TouchableOpacity>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  inner: {
+  container: {
     flex: 1,
+    backgroundColor: BG_COLOR,
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
+    paddingTop: 48,
+    paddingBottom: 32,
+    paddingHorizontal: 24,
+  },
+  settingsBtn: {
+    position: 'absolute',
+    top: 48,
+    right: 20,
+    zIndex: 10,
+  },
+  settingsIcon: {
+    width: 44,
+    height: 44,
+    tintColor: '#ffffff',
   },
   logoContainer: {
     alignItems: 'center',
-    marginBottom: 48,
+    marginTop: 20,
   },
-  logoEmoji: {
-    fontSize: 64,
-    marginBottom: 8,
+  ropesRow: {
+    flexDirection: 'row',
+    gap: 60,
+    marginBottom: -4,
   },
-  title: {
-    fontSize: 52,
-    fontWeight: '900',
-    color: COLORS.primary,
-    letterSpacing: 12,
+  rope: {
+    width: 8,
+    height: 60,
+    backgroundColor: '#7a4a2a',
+    borderRadius: 4,
   },
-  subtitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    letterSpacing: 8,
-    marginTop: -4,
+  logo: {
+    width: width * 0.75,
+    height: 120,
   },
-  tagline: {
-    marginTop: 12,
-    fontSize: 13,
-    color: COLORS.textDim,
-    letterSpacing: 1,
-  },
-  form: {
+  inputContainer: {
     width: '100%',
-    maxWidth: 360,
-  },
-  label: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: COLORS.textMuted,
-    letterSpacing: 2,
-    marginBottom: 8,
+    marginBottom: 20,
   },
   input: {
-    backgroundColor: COLORS.surface,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 12,
-    padding: 14,
+    backgroundColor: '#555555',
+    color: '#ffffff',
     fontSize: 16,
-    color: COLORS.text,
-    marginBottom: 8,
+    fontFamily: 'Grapesoda',
+    padding: 14,
+    borderRadius: 4,
   },
-  buttonRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginTop: 8,
+  inputUnderline: {
+    height: 3,
+    backgroundColor: '#44cc44',
+    borderRadius: 2,
+    marginTop: 2,
   },
   btn: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
+    width: '100%',
+    paddingVertical: 18,
+    borderRadius: 32,
     alignItems: 'center',
+    marginBottom: 16,
   },
-  btnPrimary: {
-    backgroundColor: COLORS.primary,
-  },
-  btnSecondary: {
-    backgroundColor: 'transparent',
-    borderWidth: 1.5,
-    borderColor: COLORS.primary,
-  },
+  btnMulti: { backgroundColor: '#ff6600' },
+  btnSolo: { backgroundColor: '#cc44ff' },
   btnText: {
-    color: COLORS.background,
-    fontWeight: '800',
-    fontSize: 14,
+    color: '#ffffff',
+    fontSize: 22,
+    fontFamily: 'Grapesoda',
     letterSpacing: 1,
   },
-  backBtn: {
-    alignItems: 'center',
-    padding: 12,
-    marginTop: 4,
-  },
-  backText: {
-    color: COLORS.textMuted,
-    fontSize: 14,
-  },
   errorBox: {
-    marginTop: 12,
     backgroundColor: '#ff336622',
     borderWidth: 1,
-    borderColor: COLORS.accent,
+    borderColor: '#ff3366',
     borderRadius: 10,
     padding: 12,
+    width: '100%',
+    marginBottom: 12,
   },
   errorText: {
-    color: COLORS.accent,
+    color: '#ff3366',
     fontSize: 13,
     textAlign: 'center',
   },
-  footer: {
+  skinsBtn: {
     position: 'absolute',
     bottom: 32,
-    color: COLORS.textDim,
-    fontSize: 12,
+    right: 24,
+    backgroundColor: '#44aaff',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+  },
+  skinsBtnText: {
+    color: '#ffffff',
+    fontSize: 18,
+    fontFamily: 'Grapesoda',
   },
 });
