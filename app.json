@@ -9,7 +9,7 @@
       "adaptiveIcon": {
         "backgroundColor": "#0a0a0f"
       },
-      "package": "com.mstudiogames.pixel-snake"
+      "package": "com.mstudiogames.pixelsnake"
     },
     "extra": {
       "eas": {
