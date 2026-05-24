@@ -2,23 +2,10 @@
   "expo": {
     "name": "Pixel Snake",
     "slug": "pixel-snake",
-    "icon": "./assets/images/icon.png",
     "version": "1.0.0",
-    "orientation": "default",
-    "userInterfaceStyle": "dark",
-    "splash": {
-      "backgroundColor": "#3a3a3a"
-    },
-    "android": {
-      "adaptiveIcon": {
-        "backgroundColor": "#3a3a3a"
-      },
-      "package": "com.mstudiogames.pixelsnake"
-    },
-    "extra": {
-      "eas": {
-        "projectId": "c6f849ce-9859-45b2-b255-b7dff8c47d72"
-      }
-    }
+    "orientation": "portrait",
+    "splash": { "backgroundColor": "#3a3a3a" },
+    "android": { "package": "com.mstudiogames.pixelsnake" },
+    "extra": { "eas": { "projectId": "c6f849ce-9859-45b2-b255-b7dff8c47d72" } }
   }
 }
