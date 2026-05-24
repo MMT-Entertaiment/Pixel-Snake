@@ -1,9 +1,10 @@
 {
   "cli": {
-    "version": ">= 10.0.0"
+    "version": ">= 10.0.0",
+    "appVersionSource": "local"
   },
   "build": {
-    "production": {
+    "preview": {
       "android": {
         "buildType": "apk"
       }
